@@ -1,7 +1,14 @@
-import {videos} from "../db";
 import routes from "../routes";
-export const homeController = (req, res) => {
-    res.render("home", { pageTitle: "Home", videos }); 
+import Video from "../models/Video";
+
+export const homeController = async(req, res) => {
+    try{
+        const videos = await Video.find({}); // find all videos 
+        res.render("home", { pageTitle: "Home", videos }); // and put this videos  
+    } catch (error) {
+        console.log(error);
+        res.render("home", { pageTitle: "Home", videos : [] });
+    }
 };
 
 export const searchController = (req, res) => {
@@ -11,12 +18,18 @@ export const searchController = (req, res) => {
 };
 
 export const getuploadController = (req, res) => res.render("upload", {pageTitle: "Upload"});
-export const postuploadController = (req, res) => {
+export const postuploadController = async(req, res) => {
     const {
-        body: { file, title, description } 
+        body: { title, description }, // body 중 타이틀,설명만 정의
+        file : { path } // 파일 중 path만 정의
     }= req;
     //to do : upload and save video 
-    res.redirect(routes.videoDetail(3313));
+    const newVideo = await Video.create({
+        fileUrl : path,    // url 값만 가져옴
+        title,
+        description
+    });
+        res.redirect(routes.videoDetail(newVideo.id));
 };
 
 export const videoDetailController = (req, res) => res.render("videoDetail", { pageTitle: "Video Detail" });
