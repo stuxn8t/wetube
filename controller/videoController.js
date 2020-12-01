@@ -32,8 +32,26 @@ export const postuploadController = async(req, res) => {
         res.redirect(routes.videoDetail(newVideo.id));
 };
 
-export const videoDetailController = (req, res) => res.render("videoDetail", { pageTitle: "Video Detail" });
-export const editVideoController = (req, res) => res.render("editVideo", { pageTitle: "Edit Video" });
+export const videoDetailController = async(req, res) => {
+    //console.log(req.params);
+    const {
+        params: { id }
+    } = req;
+    try{
+        const video = await Video.findById(id);
+        //console.log(video);
+        res.render("videoDetail", { pageTitle: "Video Detail", video });
+    } catch (error) {
+        console.log(error);
+        res.redirect(routes.home);
+    }
+};
+
+export const editVideo = (req, res) =>
+  res.render("editVideo", { pageTitle: "Edit Video" });
+
+
+
 export const deleteVideoController = (req, res) => res.render("deleteVideo", { pageTitle: "Delete Video" });
 
 /* render 함수의 첫번째인자는 템플릿, 두번째인자는 템플릿에 추가할 정보가 담긴 객체*/
