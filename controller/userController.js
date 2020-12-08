@@ -23,7 +23,7 @@ export const postjoinController = async (req, res, next) => {
       await User.register(user, password);
       next();
     } catch (error) {
-      console.log(error);
+      //console.log(error);
       res.redirect(routes.home);
     }
   }
@@ -74,7 +74,7 @@ export const facebookLoginCallback = (
   profile,
   cb
 ) => {
-  console.log(accessToken, refreshToken, profile, cb);
+  //console.log(accessToken, refreshToken, profile, cb);
 };
 
 export const postFacebookLogin = (req, res) => {
@@ -95,7 +95,8 @@ export const userDetailcontroller = async (req, res) => {
     params: { id },
   } = req;
   try {
-    const user = await User.findById(id);
+    const user = await User.findById(id).populate("videos");
+    console.log(user);
     res.render("userDetail", { pageTitle: "User Detail", user });
   } catch (error) {
     res.redirect(routes.home);
@@ -130,9 +131,9 @@ export const postChangePassword = async (req, res) => {
     if (newPassword !== newPassword1) {
       res.status(400);
       res.redirect(`/users/${routes.changePassword}`);
-      console.log("old is", oldPassword);
+      /*console.log("old is", oldPassword);
       console.log("new is", newPassword);
-      console.log("new2 is", newPassword1);
+      console.log("new2 is", newPassword1);*/
       return;
     }
     req.user.changePassword(oldPassword, newPassword);

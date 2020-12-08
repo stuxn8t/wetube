@@ -6,7 +6,7 @@ export const homeController = async (req, res) => {
     const videos = await Video.find({}).sort({ _id: -1 }); // find all videos
     res.render("home", { pageTitle: "Home", videos }); // and put this videos
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     res.render("home", { pageTitle: "Home", videos: [] });
   }
 };
@@ -21,7 +21,7 @@ export const searchController = async (req, res) => {
       title: { $regex: searchingBy, $options: "i" },
     });
   } catch (error) {
-    console.log(error);
+    //console.log(error);
   }
   res.render("search", { pageTitle: "Search", searchingBy, videos });
 };
@@ -55,7 +55,7 @@ export const videoDetailController = async (req, res) => {
     //console.log(video);
     res.render("videoDetail", { pageTitle: video.title, video });
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     res.redirect(routes.home);
   }
 };
@@ -66,7 +66,11 @@ export const geteditVideo = async (req, res) => {
   } = req;
   try {
     const video = await Video.findById(id);
-    res.render("editVideo", { pageTitle: `Edit ${video.title}`, video });
+    if (video.creator !== req.user.id) {
+      throw Error();
+    } else {
+      res.render("editVideo", { pageTitle: `Edit ${video.title}`, video });
+    }
   } catch (error) {
     res.redirect(routes.home);
   }
@@ -90,8 +94,15 @@ export const deleteVideoController = async (req, res) => {
     params: { id },
   } = req;
   try {
-    await Video.findOneAndRemove({ _id: id });
-  } catch (error) {}
+    const video = await Video.findById(id);
+    if (video.creator !== req.user.id) {
+      throw Error();
+    } else {
+      await Video.findOneAndRemove({ _id: id });
+    }
+  } catch (error) {
+    //console.log(error);
+  }
   res.redirect(routes.home);
 };
 
